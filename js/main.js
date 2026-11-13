@@ -1,9 +1,9 @@
 // =========================================================
-// Austin Franklin :: main.js
+// Ege Erdal :: main.js
 //
 // One PixiJS canvas sits behind the page and draws two things:
-//   1. a field of dots that the pointer pushes and clicks ripple through
-//   2. a generative image inside every project tile
+//   1. a field of tiny dots that your mouse pushes and clicks ripple through
+//   2. a little animated picture inside every project title
 //
 // Structure:
 //   setup -> colours -> input -> dot field -> motifs -> frame loop
@@ -11,28 +11,30 @@
 
 
 // ---------- Setup ----------
-
+// Create the Pixi "app" (the canvas plus what that draws onto it).
 const app = new PIXI.Application();
 await app.init({
-  resizeTo: window,
-  backgroundAlpha: 0,           // transparent, the page colour shows through
-  antialias: true,
+  resizeTo: window,               // The canvas always fills the browser window
+  backgroundAlpha: 0,           // transparent, so the page colour shows through
+  antialias: true,          // smooth edges
   resolution: Math.min(window.devicePixelRatio || 1, 2),
   autoDensity: true,
 });
 document.getElementById("stage").appendChild(app.canvas);
 
-// Two layers: drawn in this order, so tiles cover the dots
-const fieldLayer = new PIXI.Graphics();
-const artLayer = new PIXI.Graphics();
+// Two drawing layers. later layers are painted on top of earlier ones, 
+// so the titles end up covering the dots.
+const fieldLayer = new PIXI.Graphics(); // the dots
+const artLayer = new PIXI.Graphics(); // the title pictures
 app.stage.addChild(fieldLayer, artLayer);
-
+// if the user has requested reduced motion, we will not animate the background dots unless the pointer is hovering over a tile.
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 
 // ---------- Colours ----------
 // Read from the CSS variables so the canvas follows light and dark mode.
-
+// instead of hard-coding colours they are read from the CSS variables in style.css that way the canvas
+// and the page always match, and switching between light and darkk mode recolours both at once. This is also where the green on hover comes from. (accent in dark mode).
 const colours = {};
 
 function readColours() {
@@ -43,11 +45,12 @@ function readColours() {
 }
 
 readColours();
+// if the visitor switches light/dark mode while on the page it reads the colours again.
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", readColours);
 
 
 // ---------- Input ----------
-
+//const creates something we remember about the user which is where the pointer is, and where they have clicked.
 const pointer = { x: -9999, y: -9999 };
 const ripples = [];   // every click adds one: { x, y, born }
 
@@ -61,10 +64,11 @@ window.addEventListener("pointerdown", (e) => {
 });
 
 // Each tile keeps a hover value that eases between 0 and 1
+//"hover" is the value that eases between 0 and 1 when the pointer enters or leaves a tile and target is where it is easing towards.
 const tiles = [...document.querySelectorAll(".tile")].map((el) => {
   const tile = {
-    box: el.querySelector(".art"),
-    motif: el.querySelector(".art").dataset.motif,
+    box: el.querySelector(".art"), // the empty box it paints inside
+    motif: el.querySelector(".art").dataset.motif, // which drawing to use (there is a connected comment to this in index.html)
     hover: 0,
     target: 0,
   };
@@ -77,7 +81,8 @@ const tiles = [...document.querySelectorAll(".tile")].map((el) => {
 // ---------- Dot field ----------
 // Every dot has a home position and a current position.
 // Forces push it away; a spring pulls it home again.
-
+//You can basically picture a grid of dots tied to their home spots with little springs and the pointer and ripples shove the dots away in a sense. The springs pull them back until the settle.
+// alot of the code below determines the elements of the ripple and how it interacts (the exact parametres of the interaction between the ripple and the dots)
 const SPACING = 28;
 const PUSH_RADIUS = 150;
 const RIPPLE_SPEED = 500;     // pixels per second
@@ -158,6 +163,8 @@ window.addEventListener("resize", buildField);
 //   hover  0 (resting) to 1 (pointer on the tile)
 
 // A small seeded random, so the scatter looks the same on every visit
+// Which one a tile uses is set by a data-motif="" in index.html
+//only bloom, idols and scatter are useda tht emoment; grid, rings and links are spare ones that are equipable if chosen in index.html (I deleted/chose not to use because I have a different vision for the final page)
 function seededRandom(seed) {
   return () => {
     seed = (seed * 16807) % 2147483647;
@@ -169,7 +176,7 @@ const random = seededRandom(7);
 const scatterPoints = Array.from({ length: 48 }, () => ({ x: random(), y: random(), phase: random() * 6.28 }));
 
 const motifs = {
-  // Bloom: petals that open on hover
+  // Bloom: petals that open on hover (in INTERACTIVITY)
   bloom(g, x, y, w, h, t, hover) {
     const cx = x + w / 2, cy = y + h / 2;
     const petals = 14;
@@ -190,7 +197,7 @@ const motifs = {
     g.stroke({ width: 1.25, color: colours.ink });
   },
 
-  // Four Idols: four figures built from stacked bars; hover makes them stand still
+  // Four Idols: four figures built from stacked bars; hover makes them stand still (AUDIO)
   idols(g, x, y, w, h, t, hover) {
     const columns = 4, rows = 12;
     const columnWidth = (w * 0.8) / columns;
@@ -208,7 +215,7 @@ const motifs = {
     g.fill(hover > 0.5 ? colours.accent : colours.ink);
   },
 
-  // The Unfinder: drifting points that find each other on hover
+  // The Unfinder: drifting points that find each other on hover (BACKGROUND)
   scatter(g, x, y, w, h, t, hover) {
     const points = scatterPoints.map((p) => ({
       x: x + w * (0.1 + 0.8 * p.x) + Math.sin(t * 0.7 + p.phase) * 10,
@@ -307,7 +314,8 @@ function drawTiles(time) {
 
 
 // ---------- Frame loop ----------
-
+// pixi calls this function about 60 times per second (60fps)
+// each time advance the clock, moves the dots then redraws everything. 
 let time = 0;
 
 app.ticker.add((ticker) => {

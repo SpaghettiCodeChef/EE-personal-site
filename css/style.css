@@ -1,5 +1,5 @@
 /* =========================================================
-   Austin Franklin :: style.css
+   Ege Erdal :: style.css
    1. Colours and sizes
    2. Base
    3. Header
@@ -12,32 +12,37 @@
 
 /* ---------- 1. Colours and sizes ----------
    One ink, one paper, one accent: the page reads like a printed score.
-   main.js reads these same variables, so the canvas always matches. */
+   main.js reads these same variables, so the canvas always matches. 
+   
+   --accent is the colour you see on hover. it used to be different but betwen light- and dark modes but I set them to the same.
+   */
 :root {
   color-scheme: light;
-  --paper: #ffffff;
-  --ink: #111214;
+  --paper: #eadcdc;
+  --ink: #082e14;
   --muted: #6b6f73;
-  --accent: #2b44d6;
+  --accent: #105726;
   --tile: #f1f2f0;
 
   --edge: clamp(1rem, 4vw, 3rem);
   --gap: clamp(1rem, 2.5vw, 2rem);
 }
-
+/* Same variables, new values in dark mode*/
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --paper: #101113;
+    --paper: #000000;
     --ink: #eceeea;
     --muted: #9a9ea2;
-    --accent: #8a98ff;
+    --accent: #105726;
     --tile: #1a1c1f;
   }
 }
 
 
-/* ---------- 2. Base ---------- */
+/* ---------- 2. Base ----------
+It makes the canvas fixed behind the page and lets clicks through, and sets up the font and spacing for the rest of the page.
+ */
 *, *::before, *::after { box-sizing: border-box; }
 
 body {
@@ -53,7 +58,7 @@ a { color: inherit; text-underline-offset: 0.2em; }
 a:hover { color: var(--accent); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
-/* The canvas is fixed behind the page and lets clicks through */
+
 #stage {
   position: fixed;
   inset: 0;
@@ -61,7 +66,7 @@ a:hover { color: var(--accent); }
   pointer-events: none;
 }
 #stage canvas { display: block; }
-
+/* everything else sits one layer above the canvas*/
 .top, main, .bottom {
   position: relative;
   z-index: 1;
@@ -71,8 +76,8 @@ a:hover { color: var(--accent); }
 /* ---------- 3. Header ---------- */
 .top {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
+  justify-content: space-between; /* logo on the left, nav on the right*/
+  align-items: baseline; 
   padding: var(--edge);
 }
 
@@ -91,7 +96,7 @@ main { padding: 0 var(--edge); }
 
 /* ---------- 4. Intro ---------- */
 .intro {
-  max-width: 40rem;
+  max-width: 40rem; /* keeps lines, short enough to read comfortably */
   padding: clamp(2rem, 10vh, 6rem) 0;
   font-size: clamp(1.2rem, 2vw, 1.45rem);
   line-height: 1.4;
@@ -120,6 +125,7 @@ main { padding: 0 var(--edge); }
   margin: 0;
   padding: 0;
   display: grid;
+  /* As many columns as fit, each at least 20re wide (or the full width on small screens) */
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
   gap: calc(var(--gap) * 1.5) var(--gap);
 }
@@ -150,14 +156,14 @@ main { padding: 0 var(--edge); }
   letter-spacing: -0.03em;
   margin: 0 0 2rem;
 }
-
+/* Text columns, they sit side by side on wide screens and stack on narrow ones*/
 .cols {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
   gap: var(--gap) calc(var(--gap) * 2);
   max-width: 64rem;
 }
-
+/* Small grey subheadings not used in HTMl right now (I removed the h3 but I'll keep this just in case*/
 .cols h3 {
   font-size: 1rem;
   font-weight: 400;
