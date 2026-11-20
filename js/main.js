@@ -237,40 +237,6 @@ const motifs = {
     g.fill(colours.ink);
   },
 
-  idols(g, x, y, w, h, t, hover) {
-    const columns = 4, rows = 12;
-    const columnWidth = (w * 0.8) / columns;
-    const rowHeight = (h * 0.7) / rows;
-    const sway = 1 - hover;
-
-    for (let c = 0; c < columns; c++) {
-      const centre = x + w * 0.1 + columnWidth * (c + 0.5);
-      for (let r = 0; r < rows; r++) {
-        const barWidth = columnWidth * (0.25 + 0.5 * Math.abs(Math.sin(r * 0.7 + c * 1.3)));
-        const shift = Math.sin(t * 1.2 + r * 0.4 + c) * columnWidth * 0.15 * sway;
-        g.rect(centre - barWidth / 2 + shift, y + h * 0.15 + r * rowHeight, barWidth, rowHeight * 0.6);
-      }
-    }
-    g.fill(hover > 0.5 ? colours.accent : colours.ink);
-  },
-
-  idols(g, x, y, w, h, t, hover) {
-    const columns = 4, rows = 12;
-    const columnWidth = (w * 0.8) / columns;
-    const rowHeight = (h * 0.7) / rows;
-    const sway = 1 - hover;
-
-    for (let c = 0; c < columns; c++) {
-      const centre = x + w * 0.1 + columnWidth * (c + 0.5);
-      for (let r = 0; r < rows; r++) {
-        const barWidth = columnWidth * (0.25 + 0.5 * Math.abs(Math.sin(r * 0.7 + c * 1.3)));
-        const shift = Math.sin(t * 1.2 + r * 0.4 + c) * columnWidth * 0.15 * sway;
-        g.rect(centre - barWidth / 2 + shift, y + h * 0.15 + r * rowHeight, barWidth, rowHeight * 0.6);
-      }
-    }
-    g.fill(hover > 0.5 ? colours.accent : colours.ink);
-  },
-
   // Bounded: cells that grow and shrink inside a fixed frame
   grid(g, x, y, w, h, t, hover) {
     const columns = 8, rows = 6;
