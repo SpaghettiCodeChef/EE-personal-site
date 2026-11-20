@@ -79,7 +79,9 @@ window.addEventListener("pointerdown", (e) => {
 
 // Each tile keeps a hover value that eases between 0 and 1
 //"hover" is the value that eases between 0 and 1 when the pointer enters or leaves a tile and target is where it is easing towards.
-const tiles = [...document.querySelectorAll(".tile")].map((el) => {
+const tiles = [...document.querySelectorAll(".tile")]
+  .filter((el) => el.querySelector(".art[data-motif]"))   // only tiles that still use an animation
+  .map((el) => {
   const tile = {
     box: el.querySelector(".art"), // the empty box it paints inside
     motif: el.querySelector(".art").dataset.motif, // which drawing to use (there is a connected comment to this in index.html)
