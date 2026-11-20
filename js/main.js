@@ -59,8 +59,22 @@ window.addEventListener("pointermove", (e) => {
   pointer.y = e.clientY;
 });
 
+// ---------- Sound ----------
+// The DJ scratch that plays together with every ripple.
+const scratch = new Audio("audio/scratch.mp3");
+scratch.preload = "auto"; // load it right away so the first click has no delay
+scratch.volume = 0.6;     // 0 = silent, 1 = full volume
+
+function playScratch() {
+  // A fresh copy each time, so quick clicks can overlap instead of cutting each other off
+  const sound = scratch.cloneNode();
+  sound.volume = scratch.volume;
+  sound.play().catch(() => {}); // ignore the error if the browser blocks the sound
+}
+
 window.addEventListener("pointerdown", (e) => {
   ripples.push({ x: e.clientX, y: e.clientY, born: performance.now() });
+  playScratch();
 });
 
 // Each tile keeps a hover value that eases between 0 and 1
